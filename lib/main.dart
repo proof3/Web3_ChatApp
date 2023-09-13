@@ -9,13 +9,14 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  static const List<String> contacts = ['Ryan the Retarded',"Dora the Derranged","Harry Shithouse"];
   const MyApp({Key? key}): super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 234, 103, 3),
+      backgroundColor: const Color(0xFF7C90A0),
       body: ChangeNotifierProvider(
         create: (context) => MetaMaskProvider()..start,
         builder: (context, child) {
@@ -31,23 +32,36 @@ class MyApp extends StatelessWidget {
                   message = 'Connected';
                   return ListView(
                     padding: const EdgeInsets.all(8),
-                    children: <Widget>[
-                      Container(
-                        height: 50,
-                        color: Colors.amber[600],
-                        child: const Center(child: Text('Entry A')),
-                      ),
-                      Container(
-                        height: 50,
-                        color: Colors.amber[500],
-                        child: const Center(child: Text('Entry B')),
-                      ),
-                      Container(
-                        height: 50,
-                        color: Colors.amber[100],
-                        child: const Center(child: Text('Entry C')),
-                      ),
-                    ],
+                    children: contacts.map((contacts){
+                      return SizedBox(
+                          height: 50,
+                          width: 45,
+                          //color: const Color(0xFFF4F9E9),
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: ()
+                              {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                  Screen2(name: contacts)));
+                              },
+                              style: TextButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.fromLTRB(175, 0, 175, 0),
+                                backgroundColor: const Color(0xFFF4F9E9)
+                              ),
+                              child: Text(
+                                contacts,
+                                style: const TextStyle(
+                                  color: Color(0xFF153243),
+                                )
+                              )
+                            )
+                          ),
+                      );
+                    }).toList(),
                   );
                 }
                 else if (provider.isConnected && !provider.isInOperatingChain) {
@@ -95,6 +109,21 @@ class MyApp extends StatelessWidget {
           );
         },
       )
+    );
+  }
+}
+
+class Screen2 extends StatelessWidget {
+  const Screen2({super.key, required this.name});
+  final String name;
+
+  @override
+  Widget build (BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Chat with $name"),
+        backgroundColor: const Color(0xFF7C90A0),
+      ),
     );
   }
 }
