@@ -45,7 +45,7 @@ class ContactsMenue extends StatelessWidget {
     var menue = context.watch<MenueModel>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ListTile Sample')),
+      appBar: AppBar(title: const Text('Chat')),
       body: ListView.builder(
         itemCount: menue.chats.length,
         itemBuilder: (context, index) => ListTile(

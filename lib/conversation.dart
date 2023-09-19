@@ -1,5 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:provider/provider.dart';
+
+class ConversationModel extends ChangeNotifier {
+  final List<Message> _messages = [];
+  late String _user;
+
+  List<Message> get messages => _messages;
+
+  set messages (msgs) {
+    _messages.addAll(msgs);
+    notifyListeners();
+  }
+
+  String get user => _user;
+
+  set user(changedUser) {
+    _user = changedUser;
+    notifyListeners();
+  }
+
+  start(msgs, changedUser) {
+    messages = msgs;
+    user = changedUser;
+  }
+
+  add(msg) {
+    _messages.add(Message(id: _messages.length, message: msg, sender: true));
+    notifyListeners();
+  }
+
+}
 
 class Message {
   int id;
@@ -12,22 +43,22 @@ class Message {
 }
 
 class Conversation extends StatelessWidget {
-  final int id;
-  final String user;
-  final List<Message>  messages;
-  const Conversation({super.key, required this.id, required this.user, required this.messages});
+  const Conversation({super.key});
 
   @override
   Widget build(context) {
+
+    var conversations = context.watch<ConversationModel>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(user),
+        title: Text(conversations.user),
       ),
       body: Stack(
         children: [
           SingleChildScrollView(
             child: Column(
-              children: messages.map((message) {
+              children: conversations._messages.map((message) {
                 if (message.sender) {
                   return BubbleSpecialThree(
                     text: message.message,
@@ -51,7 +82,7 @@ class Conversation extends StatelessWidget {
             )
           ),
           MessageBar(
-            onSend: (_) => print(_),
+            onSend: (String msg) => conversations.add(msg),
             actions: [
               InkWell(
                 child: const Icon(

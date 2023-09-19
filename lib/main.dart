@@ -36,17 +36,7 @@ class MyApp extends StatelessWidget {
       Message(id: 3, message: "I tried. It's awesome!!!", sender: false),
       Message(id: 4, message: "Thanks", sender: false)
     ];
-    List<Conversation> conversations = [
-      Conversation(id: 0, user: "Jane Russel", messages: messages),
-      Conversation(id: 1, user: "Glady's Murphy", messages: messages),
-      Conversation(id: 2, user: "Jorge Henry", messages: messages),
-      Conversation(id: 3, user: "Philip Fox", messages: messages),
-      Conversation(id: 4, user: "Debra Hawkins", messages: messages),
-      Conversation(id: 5, user: "Jacob Pena", messages: messages),
-      Conversation(id: 6, user: "Andrey Jones", messages: messages),
-      Conversation(id: 7, user: "Jane Russel", messages: messages),
-      Conversation(id: 8, user: "John Wick", messages: messages),
-    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFF7C90A0),
       body: ChangeNotifierProvider(
@@ -60,28 +50,40 @@ class MyApp extends StatelessWidget {
                 if (provider.isConnected && provider.isInOperatingChain) {
                   // Once user logged in start, display info here
                   // Start of with list view of all the people your chatting with
-                      
-                  return ChangeNotifierProvider(
-                    create: (context) => MenueModel()..start(chatUsers),
-                    builder: (context, child) {
-                      return Consumer<MenueModel>(
-
-                        builder: (context, menue, child) {
-                          
-                          return Row( 
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Expanded(
-                                child: ContactsMenue()
-                              ),
-                              Expanded(
-                                child: conversations[menue.selectedUserId],
-                              ),
-                            ],
-                          );
+                  
+                  return MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider<MenueModel>(
+                        create: (context) => MenueModel()..start(chatUsers),
+                      ),
+                      ChangeNotifierProxyProvider<MenueModel, ConversationModel>(
+                        create: (context) => ConversationModel()..start(messages, chatUsers[0].name),
+                        update: (context, menue, conversation) {
+                          if (conversation == null) throw ArgumentError.notNull('conversation');
+                          conversation.user = menue.selectedUserName;
+                          return conversation;
                         },
-                      );
-                    }
+                      ),
+                    ],
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          child: Consumer<MenueModel>(
+                            builder: (context, menue, child) {
+                              return const ContactsMenue();
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: Consumer<ConversationModel>(
+                            builder: (context, conversation, child) {
+                              return const Conversation();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   );
 
                 }
